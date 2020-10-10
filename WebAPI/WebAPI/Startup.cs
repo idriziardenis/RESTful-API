@@ -50,7 +50,20 @@ namespace WebAPI
                 .AddXmlDataContractSerializerFormatters()
                 .AddXmlSerializerFormatters(); ;
 
-            
+            services.AddMvc(options =>
+                options.RespectBrowserAcceptHeader = true
+            );
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .WithExposedHeaders("WWW-Authenticate")
+                    .Build());
+            });
+
 
             var appSettingsSection = Configuration.GetSection("AppSetting");
             services.Configure<AppSettings>(appSettingsSection);
@@ -141,6 +154,8 @@ namespace WebAPI
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors("CorsPolicy");
 
             app.UseHttpsRedirection();
 

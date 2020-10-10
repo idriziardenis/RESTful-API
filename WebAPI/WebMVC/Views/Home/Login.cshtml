@@ -1,0 +1,66 @@
+﻿@model Authentication
+@{
+    ViewData["Title"] = "Log in";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    SuccessResult notification = null;
+    if (ViewBag.Notification != null)
+    {
+        notification = ViewBag.Notification ;
+    }
+}
+
+@section Styles{
+    <link href="~/lib/toastr/toastr.min.css" rel="stylesheet" />
+}
+
+<!-- /.login-logo -->
+<div class="card">
+    <div class="card-body login-card-body">
+        <p class="login-box-msg">Sign in to start your session</p>
+
+        <form asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+            <div class="input-group mb-3">
+                <input type="text" asp-for="Username" class="form-control" placeholder="Email">
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+            <div class="input-group mb-3">
+                <input type="password" asp-for="Password" class="form-control" placeholder="Password">
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="row">
+                <!-- /.col -->
+                <div class="col-4">
+                    <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                </div>
+                <!-- /.col -->
+            </div>
+        </form>
+    </div>
+    <!-- /.login-card-body -->
+</div>
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="~/lib/toastr/toastr.min.js"></script>
+    <script>
+            $(function () {
+    
+                @if (notification != null)
+                {
+                    if (notification.Success)
+                    {
+    
+                       @:toastr.success('@notification.Message');
+    
+                    }
+                    else
+                    {
+                       @:toastr.error('@notification.Message');
+                    }
+                }
+    
+            });
+    </script>
+    
+}
+
+

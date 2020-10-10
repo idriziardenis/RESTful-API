@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    SuccessResult notification = null;
+    if (ViewBag.Notification != null)
+    {
+        notification = ViewBag.Notification;
+    }
+
+}
+
+@section Styles{
+    <link href="~/lib/toastr/toastr.min.css" rel="stylesheet" />
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+@section Scripts{
+    <script src="~/lib/toastr/toastr.min.js"></script>
+
+    <script>
+        $(function () {
+
+            @if (notification != null)
+            {
+                if (notification.Success)
+                {
+
+                   @:toastr.success('@notification.Message');
+
+                }
+                else
+                {
+                   @:toastr.error('@notification.Message');
+                }
+            }
+
+        });
+    </script>
+}

@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebAPI.Models;
+using WebMVC.Models;
 
-namespace WebAPI.Interfaces
+namespace WebMVC.Interfaces
 {
     public interface IAuthenticateService
     {
-        Task<User> Authenticate(Authentication model);
+        Task<(bool,string)> Authenticate(Authentication model);
     }
 }

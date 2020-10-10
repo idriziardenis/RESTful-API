@@ -29,7 +29,7 @@ namespace WebAPI.Services
             //this.userManager = userManager;
             //this.signInManager = signInManager;
         }
-        public async Task<User> Authenticate(AuthenticationModel model)
+        public async Task<User> Authenticate(Authentication model)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Username == model.Username && x.Password == model.Password);
 

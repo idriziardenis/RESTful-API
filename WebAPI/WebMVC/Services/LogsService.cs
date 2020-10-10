@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebAPI.Interfaces;
-using WebAPI.Models;
+using WebMVC.Interfaces;
+using WebMVC.Models;
 
-namespace WebAPI.Services
+namespace WebMVC.Services
 {
     public class LogsService : ILogsService
     {

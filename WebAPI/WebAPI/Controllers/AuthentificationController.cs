@@ -32,7 +32,7 @@ namespace WebAPI.Controllers
 
         [HttpPost()]
         [AllowAnonymous]
-        public async Task<IActionResult> Authenticate(AuthenticationModel model)
+        public async Task<IActionResult> Authenticate(Authentication model)
         {
             if (!ModelState.IsValid)
             {
@@ -44,13 +44,37 @@ namespace WebAPI.Controllers
             if (user != null)
             {
                 _log.AddLog(Request, _httpContextAccessor, this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), $"Eshte autentifikua useri me username: {user.Username}");
-                return Ok(_mapper.Map<User, ReadUserDTO>(user));
+                return Ok(user.Token);
             }
             else
             {
                 _log.AddLog(Request, _httpContextAccessor, this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), $"Tentim i deshtuar per tu autentifku!");
-                return BadRequest(new { message = "Username or Password is incorrect" });
+                return BadRequest("Username or Password is incorrect");
             }
         }
+
+
+        #region Comment
+        //public async Task<IActionResult> Authenticate(Authentication model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(new DataError("Model is not valid"));
+        //    }
+
+        //    var user = await _authenticateService.Authenticate(model);
+
+        //    if (user != null)
+        //    {
+        //        _log.AddLog(Request, _httpContextAccessor, this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), $"Eshte autentifikua useri me username: {user.Username}");
+        //        return Ok(_mapper.Map<User, ReadUserDTO>(user));
+        //    }
+        //    else
+        //    {
+        //        _log.AddLog(Request, _httpContextAccessor, this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), $"Tentim i deshtuar per tu autentifku!");
+        //        return BadRequest(new { message = "Username or Password is incorrect" });
+        //    }
+        //}
+        #endregion
     }
 }

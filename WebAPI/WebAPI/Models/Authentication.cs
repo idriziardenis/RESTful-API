@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WebAPI.Models
 {
-    public class AuthenticationModel
+    public class Authentication
     {
         [Required]
         public string Username { get; set; }
