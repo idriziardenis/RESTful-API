@@ -8,46 +8,25 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using WebMVC.DTOs;
 using WebMVC.Interfaces;
-using WebMVC.Models;
 
 namespace WebMVC.Repositorys
 {
-    public class SubjectsRepository : ISubjectsRepository
+    public class DepartamentsRepository : IDepartamentsRepository
     {
         private static string WebAPIUrl = "http://localhost:59249/";
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private ISession Session => _httpContextAccessor.HttpContext.Session;
 
-        public SubjectsRepository(IHttpContextAccessor httpContextAccessor)
+        public DepartamentsRepository(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public Task<Subject> Add(Subject t)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Subject> Get(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Subject> Remove(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Subject> Update(int id, Subject newT)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<(bool, IEnumerable<ReadSubjectDTO>)> GetAll()
+        private ISession Session => _httpContextAccessor.HttpContext.Session;
+        public async Task<(bool, IEnumerable<ReadDepartamentDTO>)> GetAll()
         {
             using (var client = new HttpClient())
             {
-                IEnumerable<ReadSubjectDTO> subjects = null;
+                IEnumerable<ReadDepartamentDTO> departaments = null;
                 client.DefaultRequestHeaders.Clear();
                 client.BaseAddress = new Uri(WebAPIUrl);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType: "application/json"));
@@ -68,19 +47,19 @@ namespace WebMVC.Repositorys
 
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme: "Bearer", parameter: token);
 
-                var responseMessage = await client.GetAsync(requestUri: "/api/Subjects");
+                var responseMessage = await client.GetAsync(requestUri: "/api/Departments");
 
                 if (responseMessage.IsSuccessStatusCode)
                 {
                     var resultMessage = responseMessage.Content.ReadAsStringAsync().Result;
-                    subjects = JsonConvert.DeserializeObject<IEnumerable<ReadSubjectDTO>>(resultMessage);
+                    departaments = JsonConvert.DeserializeObject<IEnumerable<ReadDepartamentDTO>>(resultMessage);
                 }
                 else
                 {
 
                 }
 
-                return (responseMessage.IsSuccessStatusCode, subjects);
+                return (responseMessage.IsSuccessStatusCode, departaments);
             }
         }
     }

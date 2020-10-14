@@ -13,7 +13,7 @@ using WebAPI.Models;
 
 namespace WebAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     [Authorize]
     public class AuthentificationController : ControllerBase
@@ -50,6 +50,20 @@ namespace WebAPI.Controllers
             {
                 _log.AddLog(Request, _httpContextAccessor, this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), $"Tentim i deshtuar per tu autentifku!");
                 return BadRequest("Username or Password is incorrect");
+            }
+        }
+
+        [HttpGet()]
+        [AllowAnonymous]
+        public IActionResult IsValidToken(string token)
+        {
+            if(_authenticateService.IsValidToken(token))
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
             }
         }
 

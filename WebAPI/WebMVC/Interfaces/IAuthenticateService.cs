@@ -9,5 +9,6 @@ namespace WebMVC.Interfaces
     public interface IAuthenticateService
     {
         Task<(bool,string)> Authenticate(Authentication model);
+        Task<bool> IsValidTokenAsync(string token);
     }
 }

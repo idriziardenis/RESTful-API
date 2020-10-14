@@ -31,6 +31,10 @@ namespace WebAPI.Profiles
             // Exam
             CreateMap<AddExamDTO, Exam>();
             CreateMap<Exam, ReadExamDTO>();
+
+            // Departament
+            CreateMap<ReadDepartamentDTO, Department>();
+            CreateMap<Department, ReadDepartamentDTO>();
         }
     }
 }

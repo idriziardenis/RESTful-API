@@ -10,6 +10,6 @@ namespace WebMVC.Interfaces
     public interface IStudentsRepository : IDataRepository<Student>
     {
         Task<(bool, IEnumerable<ReadStudentDTO>)> GetAll();
-        IEnumerable<Student> GetLastFive();
+        Task<(bool, IEnumerable<ReadStudentDTO>)> GetLastFive();
     }
 }

@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebMVC.DTOs;
-using WebMVC.Models;
 
 namespace WebMVC.Interfaces
 {
-    public interface ISubjectsRepository : IDataRepository<Subject>
+    public interface IDepartamentsRepository
     {
-        Task<(bool, IEnumerable<ReadSubjectDTO>)> GetAll();
+        Task<(bool, IEnumerable<ReadDepartamentDTO>)> GetAll();
     }
 }

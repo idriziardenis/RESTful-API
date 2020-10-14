@@ -25,6 +25,6 @@ namespace WebMVC.DTOs
         public int DepartmentId { get; set; }
 
         [Required]
-        public Status Status { get; set; }
+        public int Status { get; set; }
     }
 }

@@ -47,6 +47,27 @@ namespace WebAPI.Services
                 return null;
             }
         }
+
+        public bool IsValidToken(string token)
+        {
+            try
+            {
+                ClaimsPrincipal principal = TokenProvider.GetPrincipal(token);
+                if(principal == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
         //public Task<User> Authenticate(string userName, string password)
         //{
         //    throw new NotImplementedException();

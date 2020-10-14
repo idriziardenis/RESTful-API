@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using WebMVC.DTOs;
 using WebMVC.Interfaces;
 
 namespace WebMVC.Controllers
@@ -11,35 +13,87 @@ namespace WebMVC.Controllers
     public class StudentsController : Controller
     {
         private IStudentsRepository _studentsRepository;
-
-        public StudentsController(IStudentsRepository studentsRepository)
+        private IProfessorsRepository _professorsRepository;
+        private ISubjectsRepository _subjectsRepository;
+        private IDepartamentsRepository _departamentsRepository;
+        public StudentsController(IStudentsRepository studentsRepository, IProfessorsRepository professorsRepository, ISubjectsRepository subjectsRepository, IDepartamentsRepository departamentsRepository)
         {
             _studentsRepository = studentsRepository;
+            _professorsRepository = professorsRepository;
+            _subjectsRepository = subjectsRepository;
+            _departamentsRepository = departamentsRepository;
         }
 
         // GET: StudentsController
         public ActionResult Index()
+        
         {
-            var all = _studentsRepository.GetAll();
-            return View();
+            var result = _studentsRepository.GetAll().Result;
+            if(result.Item1)
+            {
+                return View(result.Item2);
+            }
+            else
+            {
+                TempData["SuccessResultF"] = false;
+                TempData["SuccessResultM"] = "You are not logged in!";
+                return RedirectToAction("Login", "Home");
+            }
+        }
+
+        public ActionResult LastFive()
+
+        {
+            var result = _studentsRepository.GetLastFive().Result;
+            if (result.Item1)
+            {
+                return View(result.Item2);
+            }
+            else
+            {
+                TempData["SuccessResultF"] = false;
+                TempData["SuccessResultM"] = "You are not logged in!";
+                return RedirectToAction("Login", "Home");
+            }
         }
 
         // GET: StudentsController/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            var result = _studentsRepository.GetAll().Result;
+            if (result.Item1)
+            {
+                return View(result.Item2);
+            }
+            else
+            {
+                TempData["SuccessResultF"] = false;
+                TempData["SuccessResultM"] = "You are not logged in!";
+                return RedirectToAction("Login", "Home");
+            }
         }
 
         // GET: StudentsController/Create
-        public ActionResult Create()
+        public ActionResult Add()
         {
-            return View();
+            var result = _departamentsRepository.GetAll().Result;
+            if(result.Item1)
+            {
+                ViewBag.DepartmentId = new SelectList(result.Item2, "Id", "DepartmentName");
+                return View();
+            }
+            else
+            {
+                TempData["SuccessResultF"] = false;
+                TempData["SuccessResultM"] = "You are not logged in!";
+                return RedirectToAction("Login", "Home");
+            } 
         }
 
         // POST: StudentsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(AddStudentDTO model)
         {
             try
             {

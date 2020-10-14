@@ -144,6 +144,7 @@ namespace WebAPI
             services.AddScoped<IStudentsRepository, StudentsRepository>();
             services.AddScoped<ISubjectsRepository, SubjectsRepository>();
             services.AddScoped<IProfessorsRepository, ProfessorsRepository>();
+            services.AddScoped<IDepartamentsRepository, DepartamentsRepository>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 

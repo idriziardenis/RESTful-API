@@ -1,9 +1,11 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -31,7 +33,7 @@ namespace WebMVC.Services
                     client.BaseAddress = new Uri(WebAPIUrl);
                     client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue(mediaType: "application/json"));
 
-                    var responseMessage = await client.PostAsJsonAsync<Authentication>(requestUri: "/api/Authentification", model);
+                    var responseMessage = await client.PostAsJsonAsync<Authentication>(requestUri: "/api/Authentification/Authenticate", model);
 
                     var resultMessage = responseMessage.Content.ReadAsStringAsync().Result;
                     tokenBased = JsonConvert.DeserializeObject<string>(resultMessage);
@@ -45,6 +47,28 @@ namespace WebMVC.Services
                 throw;
             }
             
+        }
+
+        public async Task<bool> IsValidTokenAsync(string token)
+        {
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Clear();
+                    client.BaseAddress = new Uri(WebAPIUrl);
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType: "application/json"));
+                    var requestUri = QueryHelpers.AddQueryString("/api/Authentification/IsValidToken", "token",token);
+                    var response = await client.GetAsync(requestUri);
+                    var resultMessage = response.Content.ReadAsStringAsync().Result;
+                    return response.IsSuccessStatusCode;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
         }
     }
 }

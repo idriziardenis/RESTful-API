@@ -36,5 +36,39 @@ namespace WebAPI.Shared
 
             return handler.WriteToken(token);
         }
+
+        public static ClaimsPrincipal GetPrincipal(string token)
+        {
+            try
+            {
+                JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+                JwtSecurityToken jwtToken = (JwtSecurityToken)tokenHandler.ReadToken(token);
+
+                if(jwtToken == null)
+                {
+                    return null;
+                }
+
+                byte[] key = Convert.FromBase64String(Secret);
+
+                TokenValidationParameters parameters = new TokenValidationParameters()
+                {
+                    RequireExpirationTime = true,
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                };
+
+                SecurityToken securityToken;
+                ClaimsPrincipal principal = tokenHandler.ValidateToken(token, parameters, out securityToken);
+
+                return principal;
+            }
+            catch (Exception ex)
+            {
+
+                return null;
+            }
+        }
     }
 }

@@ -17,10 +17,12 @@ namespace WebMVC.Repositorys
     {
         private static string WebAPIUrl = "http://localhost:59249/";
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IAuthenticateService _authenticateService;
         private ISession Session => _httpContextAccessor.HttpContext.Session;
-        public StudentsRepository(IHttpContextAccessor httpContextAccessor)
+        public StudentsRepository(IHttpContextAccessor httpContextAccessor, IAuthenticateService authenticateService)
         {
             _httpContextAccessor = httpContextAccessor;
+            _authenticateService = authenticateService;
         }
 
         public Task<Student> Add(Student t)
@@ -42,6 +44,20 @@ namespace WebMVC.Repositorys
                 client.BaseAddress = new Uri(WebAPIUrl);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType: "application/json"));
                 var token = Session.GetString("Token");
+
+                if(string.IsNullOrEmpty(token))
+                {
+                    return (false, null);
+                }
+                //else
+                //{
+                //    var isValid = _authenticateService.IsValidTokenAsync(token).Result;
+                //    if(!isValid)
+                //    {
+                //        return (false, null);
+                //    }
+                //}
+
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme: "Bearer", parameter: token);
 
                 var responseMessage = await client.GetAsync(requestUri: "/api/Students/GetStudents");
@@ -60,11 +76,6 @@ namespace WebMVC.Repositorys
             }
         }
 
-        public IEnumerable<Student> GetLastFive()
-        {
-            throw new NotImplementedException();
-        }
-
         public Task<Student> Remove(int id)
         {
             throw new NotImplementedException();
@@ -73,6 +84,47 @@ namespace WebMVC.Repositorys
         public Task<Student> Update(int id, Student newT)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<(bool, IEnumerable<ReadStudentDTO>)> GetLastFive()
+        {
+            using (var client = new HttpClient())
+            {
+                IEnumerable<ReadStudentDTO> students = null;
+                client.DefaultRequestHeaders.Clear();
+                client.BaseAddress = new Uri(WebAPIUrl);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType: "application/json"));
+                var token = Session.GetString("Token");
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    return (false, null);
+                }
+                //else
+                //{
+                //    var isValid = _authenticateService.IsValidTokenAsync(token).Result;
+                //    if(!isValid)
+                //    {
+                //        return (false, null);
+                //    }
+                //}
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme: "Bearer", parameter: token);
+
+                var responseMessage = await client.GetAsync(requestUri: "/api/Students/GetLastFiveStudents");
+
+                if (responseMessage.IsSuccessStatusCode)
+                {
+                    var resultMessage = responseMessage.Content.ReadAsStringAsync().Result;
+                    students = JsonConvert.DeserializeObject<IEnumerable<ReadStudentDTO>>(resultMessage);
+                }
+                else
+                {
+
+                }
+
+                return (responseMessage.IsSuccessStatusCode, students);
+            }
         }
     }
 }

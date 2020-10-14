@@ -6,9 +6,7 @@ using WebAPI.Models;
 
 namespace WebAPI.Interfaces
 {
-    public interface IAuthenticateService
+    public interface IDepartamentsRepository : IDataRepository<Department>
     {
-        Task<User> Authenticate(Authentication model);
-        bool IsValidToken(string token);
     }
 }
