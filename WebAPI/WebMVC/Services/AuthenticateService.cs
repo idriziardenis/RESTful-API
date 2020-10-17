@@ -67,7 +67,7 @@ namespace WebMVC.Services
             catch (Exception ex)
             {
 
-                throw;
+                throw ex;
             }
         }
     }

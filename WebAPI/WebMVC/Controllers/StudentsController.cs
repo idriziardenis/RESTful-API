@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using WebMVC.DTOs;
 using WebMVC.Interfaces;
+using WebMVC.Models;
 
 namespace WebMVC.Controllers
 {
@@ -26,83 +27,144 @@ namespace WebMVC.Controllers
 
         // GET: StudentsController
         public ActionResult Index()
-        
         {
-            var result = _studentsRepository.GetAll().Result;
-            if(result.Item1)
+            try
             {
-                return View(result.Item2);
+                var result = _studentsRepository.GetAll().Result;
+                if (result.Item1)
+                {
+                    if(TempData["SuccessResultF"] != null)
+                    {
+                        ViewBag.Notification = new SuccessResult((bool)TempData["SuccessResultF"], (string)TempData["SuccessResultM"]);
+                    }
+                    return View(result.Item2);
+                }
+                else
+                {
+                    TempData["SuccessResultF"] = false;
+                    TempData["SuccessResultM"] = "You are not logged in!";
+                    return RedirectToAction("Login", "Home");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                TempData["SuccessResultF"] = false;
-                TempData["SuccessResultM"] = "You are not logged in!";
-                return RedirectToAction("Login", "Home");
+
+                throw ex;
             }
+            
         }
 
         public ActionResult LastFive()
-
         {
-            var result = _studentsRepository.GetLastFive().Result;
-            if (result.Item1)
+            try
             {
-                return View(result.Item2);
+                var result = _studentsRepository.GetLastFive().Result;
+                if (result.Item1)
+                {
+                    return View(result.Item2);
+                }
+                else
+                {
+                    TempData["SuccessResultF"] = false;
+                    TempData["SuccessResultM"] = "You are not logged in!";
+                    return RedirectToAction("Login", "Home");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                TempData["SuccessResultF"] = false;
-                TempData["SuccessResultM"] = "You are not logged in!";
-                return RedirectToAction("Login", "Home");
+
+                throw ex;
             }
+            
         }
 
         // GET: StudentsController/Details/5
         public ActionResult Details(int id)
         {
-            var result = _studentsRepository.GetAll().Result;
-            if (result.Item1)
+            try
             {
-                return View(result.Item2);
+                var result = _studentsRepository.GetAll().Result;
+                if (result.Item1)
+                {
+                    return View(result.Item2);
+                }
+                else
+                {
+                    TempData["SuccessResultF"] = result.Item1;
+                    TempData["SuccessResultM"] = "You are not logged in!";
+                    return RedirectToAction("Login", "Home");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                TempData["SuccessResultF"] = false;
-                TempData["SuccessResultM"] = "You are not logged in!";
-                return RedirectToAction("Login", "Home");
+
+                throw ex;
             }
+            
         }
 
         // GET: StudentsController/Create
         public ActionResult Add()
         {
-            var result = _departamentsRepository.GetAll().Result;
-            if(result.Item1)
+            try
             {
-                ViewBag.DepartmentId = new SelectList(result.Item2, "Id", "DepartmentName");
-                return View();
+                var result = _departamentsRepository.GetAll().Result;
+                if (result.Item1)
+                {
+                    ViewBag.DepartmentId = new SelectList(result.Item2, "Id", "DepartmentName");
+                    return View();
+                }
+                else
+                {
+                    TempData["SuccessResultF"] = result.Item1;
+                    TempData["SuccessResultM"] = "You are not logged in!";
+                    return RedirectToAction("Login", "Home");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                TempData["SuccessResultF"] = false;
-                TempData["SuccessResultM"] = "You are not logged in!";
-                return RedirectToAction("Login", "Home");
-            } 
+
+                throw ex;
+            }
+             
         }
 
         // POST: StudentsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(AddStudentDTO model)
+        public ActionResult Add(AddStudentDTO model)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                if (!ModelState.IsValid)
+                {
+                    ViewBag.Notification = new SuccessResult(false, "All fields are required!");
+                    return View(model);
+                }
+                var result = _studentsRepository.Add(model).Result;
+                if (result.Item1)
+                {
+                    TempData["SuccessResultF"] = result.Item1;
+                    TempData["SuccessResultM"] = result.Item2;
+
+                    return RedirectToAction("Index", "Students");
+                }
+                else
+                {
+                    ViewBag.Notification = new SuccessResult((bool)result.Item1, (string)result.Item2);
+                    model.Index = "";
+
+                    var dep = _departamentsRepository.GetAll().Result;
+                    ViewBag.DepartmentId = new SelectList(dep.Item2, "Id", "DepartmentName");
+                    return View(model);
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+
+                throw ex;
             }
+            
         }
 
         // GET: StudentsController/Edit/5

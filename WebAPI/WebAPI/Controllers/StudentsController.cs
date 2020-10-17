@@ -74,7 +74,7 @@ namespace WebAPI.Controllers
 
                     var readStudentDto = _mapper.Map<ReadStudentDTO>(studentModel);
                     _log.AddLog(Request, _httpContextAccessor, this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), "Eshte shtuar nje student i ri");
-                    return Ok("Studenti eshte regjistruar me sukses!");
+                    return Ok(new DataError("Studenti eshte regjistruar me sukses!"));
                 }
                 catch (Exception ex)
                 {

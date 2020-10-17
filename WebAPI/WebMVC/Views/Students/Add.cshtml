@@ -2,6 +2,15 @@
 
 @{
     ViewBag.Title = "Add";
+    SuccessResult notification = null;
+    if (ViewBag.Notification != null)
+    {
+        notification = ViewBag.Notification;
+    }
+}
+
+@section Styles{
+    <link href="~/lib/toastr/toastr.min.css" rel="stylesheet" />
 }
 
 <h2>Add Student</h2>
@@ -55,7 +64,7 @@
         </div>
 
         <div class="form-group">
-                @Html.LabelFor(model => model.Status, "Status", htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.Status, "Status", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 <select class="form-control" asp-for="Status" asp-items="Html.GetEnumSelectList<Status>()"></select>
                 @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
@@ -80,4 +89,25 @@
 @section Scripts {
     <script src="~/lib/jquery-validation/dist/additional-methods.min.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="~/lib/toastr/toastr.min.js"></script>
+    <script>
+            $(function () {
+
+                @if (notification != null)
+                {
+                    if (notification.Success)
+                    {
+
+                       @:toastr.success('@notification.Message');
+
+                    }
+                    else
+                    {
+                       @:toastr.error('@notification.Message');
+                    }
+                }
+
+            });
+    </script>
 }

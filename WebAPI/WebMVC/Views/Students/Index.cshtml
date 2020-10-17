@@ -2,6 +2,15 @@
 
 @{
     ViewBag.Title = "Index";
+    SuccessResult notification = null;
+    if (ViewBag.Notification != null)
+    {
+        notification = ViewBag.Notification;
+    }
+}
+
+@section Styles{
+    <link href="~/lib/toastr/toastr.min.css" rel="stylesheet" />
 }
 
 <h2>Index</h2>
@@ -11,7 +20,7 @@
             <a asp-action="LastFive" style="margin-left: -15px; margin-bottom:10px" class="btn btn-outline-primary">Last Five</a>
         </div>
         <div class="col-md-6">
-            <a asp-action="Create" style="float: right !important; margin-right: -15px; margin-bottom:10px" class="btn btn-outline-success">Add New</a>
+            <a asp-action="Add" style="float: right !important; margin-right: -15px; margin-bottom:10px" class="btn btn-outline-success">Add New</a>
         </div>
 
 
@@ -65,10 +74,34 @@
                 @Html.DisplayFor(modelItem => item.DepartmentId)
             </td>
             <td>
-                <a asp-action="Edit" class="btn btn-warning">Edit</a> 
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
                 <a asp-action="Delete" asp-route-id="@item.Id" style="margin-left:15px" class="btn btn-danger">Delete</a>
             </td>
         </tr>
     }
 
 </table>
+
+@section Scripts {
+    <script src="~/lib/toastr/toastr.min.js"></script>
+    <script>
+            $(function () {
+
+                @if (notification != null)
+                {
+                    if (notification.Success)
+                    {
+
+                       @:toastr.success('@notification.Message');
+
+                    }
+                    else
+                    {
+                       @:toastr.error('@notification.Message');
+                    }
+                }
+
+            });
+    </script>
+}
+    

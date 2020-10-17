@@ -7,8 +7,9 @@ using WebMVC.Models;
 
 namespace WebMVC.Interfaces
 {
-    public interface IStudentsRepository : IDataRepository<Student>
+    public interface IStudentsRepository
     {
+        Task<(bool, string)> Add(AddStudentDTO student);
         Task<(bool, IEnumerable<ReadStudentDTO>)> GetAll();
         Task<(bool, IEnumerable<ReadStudentDTO>)> GetLastFive();
     }
