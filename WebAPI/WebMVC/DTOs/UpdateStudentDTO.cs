@@ -13,6 +13,6 @@ namespace WebMVC.DTOs
         public DateTime DateOfBirth { get; set; }
         public string Index { get; set; }
         public int DepartmentId { get; set; }
-        public Status Status { get; set; }
+        public int StatusId { get; set; }
     }
 }

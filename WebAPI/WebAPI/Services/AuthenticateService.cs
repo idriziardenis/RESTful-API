@@ -38,8 +38,11 @@ namespace WebAPI.Services
                 user.Token = TokenProvider.GenerateToken(user.Username, user.Id.ToString());
                 user.TokenExpireTime = DateTime.UtcNow.AddMinutes(20);
                 user.LastLogin = DateTime.UtcNow;
-                _context.Entry(await _context.Users.FirstOrDefaultAsync(x => x.Id == user.Id)).CurrentValues.SetValues(user);
-                await _context.SaveChangesAsync();
+
+                var task = Task.Run(() => _context.Entry(_context.Users.FirstOrDefault(x => x.Id == user.Id)).CurrentValues.SetValues(user));
+
+                await task.ContinueWith(task => _context.SaveChangesAsync());
+
                 return user;
             }
             else

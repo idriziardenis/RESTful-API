@@ -21,6 +21,7 @@ namespace WebAPI.Models
         public virtual DbSet<Professor> Professors { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Student> Students { get; set; }
+        public virtual DbSet<Status> Status { get; set; }
         public virtual DbSet<Subject> Subjects { get; set; }
         public virtual DbSet<User> Users { get; set; }
 
@@ -70,6 +71,13 @@ namespace WebAPI.Models
                     .HasForeignKey(d => d.SubjectId);
             });
 
+            modelBuilder.Entity<Status>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+            });
+
             modelBuilder.Entity<Student>(entity =>
             {
                 entity.HasIndex(e => e.DepartmentId);
@@ -83,6 +91,12 @@ namespace WebAPI.Models
                 entity.HasOne(d => d.Department)
                     .WithMany(p => p.Students)
                     .HasForeignKey(d => d.DepartmentId);
+
+                entity.HasOne(d => d.Status)
+                    .WithMany(p => p.Students)
+                    .HasForeignKey(d => d.StatusId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Students_Status");
             });
 
             modelBuilder.Entity<Subject>(entity =>

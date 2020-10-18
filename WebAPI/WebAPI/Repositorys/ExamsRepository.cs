@@ -26,7 +26,7 @@ namespace WebAPI.Repositorys
                 throw new ArgumentNullException(nameof(t));
             }
 
-            var professor = await _context.Professors.FindAsync(t.ProfessorId);
+            var professor = _context.Professors.Find(t.ProfessorId);
 
             if (professor.SubjectId != t.SubjectId)
             {
@@ -49,8 +49,8 @@ namespace WebAPI.Repositorys
                 }
             }
 
-            _context.Add(t);
-            await _context.SaveChangesAsync();
+            var task = Task.Run(() => _context.Add(t));
+            await task.ContinueWith(task => _context.SaveChangesAsync());
             return t;
         }
 

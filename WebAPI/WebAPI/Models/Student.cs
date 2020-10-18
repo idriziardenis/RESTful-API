@@ -16,11 +16,12 @@ namespace WebAPI.Models
         public DateTime DateOfBirth { get; set; }
         public string Index { get; set; }
         public int DepartmentId { get; set; }
-        public int Status { get; set; }
+        public int StatusId { get; set; }
         public DateTime? LastModifiedDate { get; set; }
         public DateTime? RegisteredDate { get; set; }
 
         public virtual Department Department { get; set; }
         public virtual ICollection<Exam> Exams { get; set; }
+        public virtual Status Status { get; set; }
     }
 }

@@ -8,6 +8,6 @@ namespace WebAPI.Interfaces
 {
     public interface IStudentsRepository : IDataRepository<Student>
     {
-        IEnumerable<Student> GetLastFive();
+        Task<IEnumerable<Student>> GetLastFiveAsync();
     }
 }

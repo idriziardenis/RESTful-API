@@ -35,6 +35,10 @@ namespace WebAPI.Profiles
             // Departament
             CreateMap<ReadDepartamentDTO, Department>();
             CreateMap<Department, ReadDepartamentDTO>();
+
+            // Status
+            CreateMap<ReadStatusesDTO, Status>();
+            CreateMap<Status, ReadStatusesDTO>();
         }
     }
 }

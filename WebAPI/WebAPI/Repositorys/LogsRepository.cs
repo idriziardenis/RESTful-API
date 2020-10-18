@@ -23,9 +23,8 @@ namespace WebAPI.Repositorys
                 throw new ArgumentNullException(nameof(log));
             }
 
-            _context.Logs.Add(log);
-
-            await _context.SaveChangesAsync();
+            var task = Task.Run(() => _context.Logs.Add(log));
+            await task.ContinueWith(task => _context.SaveChangesAsync());
 
             return log;
         }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using WebAPI.Enumerations;
 
 namespace WebAPI.DTOs
 {
@@ -25,6 +24,6 @@ namespace WebAPI.DTOs
         public int DepartmentId { get; set; }
 
         [Required]
-        public Status Status { get; set; }
+        public int StatusId { get; set; }
     }
 }

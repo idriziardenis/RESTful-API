@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebAPI.Enumerations;
 
 namespace WebAPI.DTOs
 {
@@ -13,6 +12,6 @@ namespace WebAPI.DTOs
         public DateTime DateOfBirth { get; set; }
         public string Index { get; set; }
         public int DepartmentId { get; set; }
-        public Status Status { get; set; }
+        public int StatusId { get; set; }
     }
 }

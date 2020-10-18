@@ -36,7 +36,7 @@ namespace WebAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new DataError("Model is not valid"));
+                return BadRequest(new DataMessage("Model is not valid"));
             }
 
             var user = await _authenticateService.Authenticate(model);

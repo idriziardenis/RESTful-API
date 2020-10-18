@@ -41,9 +41,9 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet(Name = "GetLastFiveStudents")]
-        public IActionResult GetLastFiveStudents()
+        public async Task<IActionResult> GetLastFiveStudentsAsync()
         {
-            var students = _context.GetLastFive();
+            var students = await _context.GetLastFiveAsync();
             _log.AddLog(Request, _httpContextAccessor, this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), "Eshte nxjerrur lista e 5 studenteve te fundit");
             return Ok(_mapper.Map<IEnumerable<ReadStudentDTO>>(students));
         }
@@ -55,7 +55,7 @@ namespace WebAPI.Controllers
             if (item == null)
             {
                 _log.AddLog(Request, _httpContextAccessor, this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), $"Nuk eshte gjetur studenti me id: {id}");
-                return NotFound(new DataError("Student not found"));
+                return NotFound(new DataMessage("Student not found"));
             } 
             _log.AddLog(Request, _httpContextAccessor, this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), $"Eshte nxjerrur studenti me id: {id}");
             return Ok(_mapper.Map<ReadStudentDTO>(item));
@@ -74,12 +74,12 @@ namespace WebAPI.Controllers
 
                     var readStudentDto = _mapper.Map<ReadStudentDTO>(studentModel);
                     _log.AddLog(Request, _httpContextAccessor, this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), "Eshte shtuar nje student i ri");
-                    return Ok(new DataError("Studenti eshte regjistruar me sukses!"));
+                    return Ok(new DataMessage("Studenti eshte regjistruar me sukses!"));
                 }
                 catch (Exception ex)
                 {
                     _log.AddLog(Request, _httpContextAccessor, this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), "Deshtim ne regjistrimin e nje studenti");
-                    return BadRequest(new DataError("Regjistrimi deshtoi " + ex.Message));
+                    return BadRequest(new DataMessage("Regjistrimi deshtoi " + ex.Message));
                 }
             }
             else
@@ -98,12 +98,12 @@ namespace WebAPI.Controllers
                     var student = _mapper.Map<Student>(updateStudentDTO);
                     await _context.Update(id, student);
                     _log.AddLog(Request, _httpContextAccessor, this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), $"Eshte edituar studenti me id: {id}");
-                    return Ok("Studenti eshte edituar me sukses!");
+                    return Ok(new DataMessage("Studenti eshte edituar me sukses!"));
                 }
                 catch (Exception ex)
                 {
                     _log.AddLog(Request, _httpContextAccessor, this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), $"Deshtim ne editimin e studentit me id: {id}");
-                    return BadRequest(new DataError("Editimi deshtoi " + ex.Message));
+                    return BadRequest(new DataMessage("Editimi deshtoi " + ex.Message));
                 }
             }
             else
@@ -123,12 +123,12 @@ namespace WebAPI.Controllers
 
                 await _context.Remove(id);
                 _log.AddLog(Request, _httpContextAccessor, this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), $"Eshte fshire studenti me id: {id}");
-                return Ok("Studenti eshte fshire me sukses!");
+                return Ok(new DataMessage("Studenti eshte fshire me sukses!"));
             }
             catch (Exception ex)
             {
                 _log.AddLog(Request, _httpContextAccessor, this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), $"Deshtim ne editimin e studentit me id: {id}");
-                return BadRequest(new DataError("Fshirja deshtoi " + ex.Message));
+                return BadRequest(new DataMessage("Fshirja deshtoi " + ex.Message));
             }
 
         }

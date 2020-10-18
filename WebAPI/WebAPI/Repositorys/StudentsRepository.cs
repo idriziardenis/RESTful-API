@@ -33,8 +33,9 @@ namespace WebAPI.Repositorys
             var itemToDelete = await Get(id);
             if (itemToDelete != null)
             {
-                _context.Remove(itemToDelete);
-                await _context.SaveChangesAsync();
+                var task = Task.Run(() => _context.Remove(itemToDelete));
+                await task.ContinueWith(task => _context.SaveChangesAsync());
+
                 return itemToDelete;
             }
             else
@@ -51,8 +52,9 @@ namespace WebAPI.Repositorys
 
             newT.Id = id;
             newT.LastModifiedDate = DateTime.Now;
-            _context.Entry(await _context.Students.FirstOrDefaultAsync(x => x.Id == newT.Id)).CurrentValues.SetValues(newT);
-            await _context.SaveChangesAsync();
+
+            var task = Task.Run(() => _context.Entry(_context.Students.FirstOrDefault(x => x.Id == newT.Id)).CurrentValues.SetValues(newT));
+            await task.ContinueWith(task => _context.SaveChangesAsync());
 
             return newT;
         }
@@ -72,17 +74,17 @@ namespace WebAPI.Repositorys
             }
             else
             {
-                _context.Students.Add(student);
+                var task = Task.Run(() => _context.Students.Add(student));
 
-                await _context.SaveChangesAsync();
+                await task.ContinueWith(task => _context.SaveChangesAsync());
 
                 return student;
             }
         }
 
-        public IEnumerable<Student> GetLastFive()
+        public async Task<IEnumerable<Student>> GetLastFiveAsync()
         {
-            return _context.Students.Take(5).OrderBy(x => x.RegisteredDate).ToList();
+            return await _context.Students.OrderByDescending(x => x.RegisteredDate).Take(5).ToListAsync();
         }
     }
 }

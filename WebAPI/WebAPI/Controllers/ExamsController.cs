@@ -51,12 +51,12 @@ namespace WebAPI.Controllers
 
                     var readExamDto = _mapper.Map<ReadExamDTO>(examModel);
                     _log.AddLog(Request, _httpContextAccessor, this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), "Eshte regjistruar nje provim");
-                    return Ok("Provimi u regjistrua me sukses");
+                    return Ok(new DataMessage("Provimi u regjistrua me sukses"));
                 }
                 catch (Exception ex)
                 {
                     _log.AddLog(Request, _httpContextAccessor, this.ControllerContext.RouteData.Values["controller"].ToString(), this.ControllerContext.RouteData.Values["action"].ToString(), "Deshtim ne regjistrimin e nje provimi.");
-                    return BadRequest(new DataError("Insetimi deshtoi " + ex.Message));
+                    return BadRequest(new DataMessage("Insetimi deshtoi " + ex.Message));
                 }
             }
             else

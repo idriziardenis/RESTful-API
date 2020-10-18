@@ -29,7 +29,7 @@ namespace WebMVC.Repositorys
         {
             using (var client = new HttpClient())
             {
-                Messages message = null;
+                DataMessage message = null;
                 client.DefaultRequestHeaders.Clear();
                 client.BaseAddress = new Uri(WebAPIUrl);
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType: "application/json"));
@@ -41,16 +41,52 @@ namespace WebMVC.Repositorys
                 }
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme: "Bearer", parameter: token);
                 var responseMessage = await client.PostAsJsonAsync<AddStudentDTO>(requestUri: "/api/Students/AddStudent", student);
-                var resultMessage = responseMessage.Content.ReadAsStringAsync().Result;
-                message = JsonConvert.DeserializeObject<Messages>(resultMessage);
+                var resultMessage = await responseMessage.Content.ReadAsStringAsync();
+                message = JsonConvert.DeserializeObject<DataMessage>(resultMessage);
 
                 return (responseMessage.IsSuccessStatusCode, message.Message);
             }
         }
 
-        public Task<Student> Get(int id)
+        public async Task<(bool, ReadStudentDTO)> GetById(int id)
         {
-            throw new NotImplementedException();
+            using (var client = new HttpClient())
+            {
+                ReadStudentDTO student = null;
+                client.DefaultRequestHeaders.Clear();
+                client.BaseAddress = new Uri(WebAPIUrl);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType: "application/json"));
+                var token = Session.GetString("Token");
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    return (false, null);
+                }
+                //else
+                //{
+                //    var isValid = await _authenticateService.IsValidTokenAsync(token);
+                //    if(!isValid)
+                //    {
+                //        return (false, null);
+                //    }
+                //}
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme: "Bearer", parameter: token);
+
+                var responseMessage = await client.GetAsync(requestUri: "/api/Students/GetSingleStudent/" + id);
+
+                if (responseMessage.IsSuccessStatusCode)
+                {
+                    var resultMessage = await responseMessage.Content.ReadAsStringAsync();
+                    student = JsonConvert.DeserializeObject<ReadStudentDTO>(resultMessage);
+                }
+                else
+                {
+
+                }
+
+                return (responseMessage.IsSuccessStatusCode, student);
+            }
         }
 
         public async Task<(bool, IEnumerable<ReadStudentDTO>)> GetAll()
@@ -69,7 +105,7 @@ namespace WebMVC.Repositorys
                 }
                 //else
                 //{
-                //    var isValid = _authenticateService.IsValidTokenAsync(token).Result;
+                //    var isValid = await _authenticateService.IsValidTokenAsync(token);
                 //    if(!isValid)
                 //    {
                 //        return (false, null);
@@ -82,7 +118,7 @@ namespace WebMVC.Repositorys
 
                 if (responseMessage.IsSuccessStatusCode)
                 {
-                    var resultMessage = responseMessage.Content.ReadAsStringAsync().Result;
+                    var resultMessage = await responseMessage.Content.ReadAsStringAsync();
                     students = JsonConvert.DeserializeObject<IEnumerable<ReadStudentDTO>>(resultMessage);
                 }
                 else
@@ -94,14 +130,28 @@ namespace WebMVC.Repositorys
             }
         }
 
-        public Task<Student> Remove(int id)
-        {
-            throw new NotImplementedException();
-        }
 
-        public Task<Student> Update(int id, Student newT)
+        public async Task<(bool,string)> Update(int id, ReadStudentDTO newT)
         {
-            throw new NotImplementedException();
+            using (var client = new HttpClient())
+            {
+                DataMessage message = null;
+                client.DefaultRequestHeaders.Clear();
+                client.BaseAddress = new Uri(WebAPIUrl);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType: "application/json"));
+                var token = Session.GetString("Token");
+                var UpdateStudentDTO = new UpdateStudentDTO() { Name = newT.Name, Surname = newT.Surname, DateOfBirth = newT.DateOfBirth, DepartmentId = newT.DepartmentId, Index = newT.Index, StatusId = newT.StatusId }; 
+                if (string.IsNullOrEmpty(token))
+                {
+                    return (false, "You are not logged in!");
+                }
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme: "Bearer", parameter: token);
+                var responseMessage = await client.PutAsJsonAsync<UpdateStudentDTO>(requestUri: "/api/Students/UpdateStudent/"+id, UpdateStudentDTO);
+                var resultMessage = await responseMessage.Content.ReadAsStringAsync();
+                message = JsonConvert.DeserializeObject<DataMessage>(resultMessage);
+
+                return (responseMessage.IsSuccessStatusCode, message.Message);
+            }
         }
 
         public async Task<(bool, IEnumerable<ReadStudentDTO>)> GetLastFive()
@@ -120,7 +170,7 @@ namespace WebMVC.Repositorys
                 }
                 //else
                 //{
-                //    var isValid = _authenticateService.IsValidTokenAsync(token).Result;
+                //    var isValid = await _authenticateService.IsValidTokenAsync(token);
                 //    if(!isValid)
                 //    {
                 //        return (false, null);
@@ -133,7 +183,7 @@ namespace WebMVC.Repositorys
 
                 if (responseMessage.IsSuccessStatusCode)
                 {
-                    var resultMessage = responseMessage.Content.ReadAsStringAsync().Result;
+                    var resultMessage = await responseMessage.Content.ReadAsStringAsync();
                     students = JsonConvert.DeserializeObject<IEnumerable<ReadStudentDTO>>(resultMessage);
                 }
                 else
@@ -142,6 +192,40 @@ namespace WebMVC.Repositorys
                 }
 
                 return (responseMessage.IsSuccessStatusCode, students);
+            }
+        }
+
+        public async Task<(bool, string)> Delete(int id)
+        {
+            using (var client = new HttpClient())
+            {
+                DataMessage dm = null;
+                client.DefaultRequestHeaders.Clear();
+                client.BaseAddress = new Uri(WebAPIUrl);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(mediaType: "application/json"));
+                var token = Session.GetString("Token");
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    return (false, null);
+                }
+                //else
+                //{
+                //    var isValid = await _authenticateService.IsValidTokenAsync(token);
+                //    if(!isValid)
+                //    {
+                //        return (false, null);
+                //    }
+                //}
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme: "Bearer", parameter: token);
+
+                var responseMessage = await client.DeleteAsync(requestUri: "/api/Students/DeleteStudent/"+id);
+
+                var resultMessage = await responseMessage.Content.ReadAsStringAsync();
+                dm = JsonConvert.DeserializeObject<DataMessage>(resultMessage);
+
+                return (responseMessage.IsSuccessStatusCode, dm.Message);
             }
         }
     }

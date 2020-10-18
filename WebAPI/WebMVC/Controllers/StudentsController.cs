@@ -17,20 +17,22 @@ namespace WebMVC.Controllers
         private IProfessorsRepository _professorsRepository;
         private ISubjectsRepository _subjectsRepository;
         private IDepartamentsRepository _departamentsRepository;
-        public StudentsController(IStudentsRepository studentsRepository, IProfessorsRepository professorsRepository, ISubjectsRepository subjectsRepository, IDepartamentsRepository departamentsRepository)
+        private IStatusRepository _statusRepository;
+        public StudentsController(IStudentsRepository studentsRepository, IProfessorsRepository professorsRepository, ISubjectsRepository subjectsRepository, IDepartamentsRepository departamentsRepository, IStatusRepository statusRepository)
         {
             _studentsRepository = studentsRepository;
             _professorsRepository = professorsRepository;
             _subjectsRepository = subjectsRepository;
             _departamentsRepository = departamentsRepository;
+            _statusRepository = statusRepository;
         }
 
         // GET: StudentsController
-        public ActionResult Index()
+        public async Task<ActionResult> IndexAsync()
         {
             try
             {
-                var result = _studentsRepository.GetAll().Result;
+                var result = await _studentsRepository.GetAll();
                 if (result.Item1)
                 {
                     if(TempData["SuccessResultF"] != null)
@@ -54,11 +56,11 @@ namespace WebMVC.Controllers
             
         }
 
-        public ActionResult LastFive()
+        public async Task<ActionResult> LastFiveAsync()
         {
             try
             {
-                var result = _studentsRepository.GetLastFive().Result;
+                var result = await _studentsRepository.GetLastFive();
                 if (result.Item1)
                 {
                     return View(result.Item2);
@@ -79,11 +81,11 @@ namespace WebMVC.Controllers
         }
 
         // GET: StudentsController/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> DetailsAsync(int id)
         {
             try
             {
-                var result = _studentsRepository.GetAll().Result;
+                var result = await _studentsRepository.GetAll();
                 if (result.Item1)
                 {
                     return View(result.Item2);
@@ -104,19 +106,24 @@ namespace WebMVC.Controllers
         }
 
         // GET: StudentsController/Create
-        public ActionResult Add()
+        public async Task<ActionResult> AddAsync()
         {
             try
             {
-                var result = _departamentsRepository.GetAll().Result;
-                if (result.Item1)
-                {
-                    ViewBag.DepartmentId = new SelectList(result.Item2, "Id", "DepartmentName");
+                var deps = _departamentsRepository.GetAll();
+                var statuses = _statusRepository.GetAll();
+
+                await Task.WhenAll(deps, statuses);
+
+                if (deps.Result.Item1)
+                { 
+                    ViewBag.DepartmentId = new SelectList(deps.Result.Item2, "Id", "DepartmentName");
+                    ViewBag.StatusId = new SelectList(statuses.Result.Item2, "Id", "Name");
                     return View();
                 }
                 else
                 {
-                    TempData["SuccessResultF"] = result.Item1;
+                    TempData["SuccessResultF"] = deps.Result.Item1;
                     TempData["SuccessResultM"] = "You are not logged in!";
                     return RedirectToAction("Login", "Home");
                 }
@@ -132,7 +139,7 @@ namespace WebMVC.Controllers
         // POST: StudentsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Add(AddStudentDTO model)
+        public async Task<ActionResult> AddAsync(AddStudentDTO model)
         {
             try
             {
@@ -141,7 +148,7 @@ namespace WebMVC.Controllers
                     ViewBag.Notification = new SuccessResult(false, "All fields are required!");
                     return View(model);
                 }
-                var result = _studentsRepository.Add(model).Result;
+                var result = await _studentsRepository.Add(model);
                 if (result.Item1)
                 {
                     TempData["SuccessResultF"] = result.Item1;
@@ -154,8 +161,14 @@ namespace WebMVC.Controllers
                     ViewBag.Notification = new SuccessResult((bool)result.Item1, (string)result.Item2);
                     model.Index = "";
 
-                    var dep = _departamentsRepository.GetAll().Result;
-                    ViewBag.DepartmentId = new SelectList(dep.Item2, "Id", "DepartmentName");
+                    var deps = _departamentsRepository.GetAll();
+                    var statuses = _statusRepository.GetAll();
+
+                    await Task.WhenAll(deps, statuses);
+
+                    ViewBag.DepartmentId = new SelectList(deps.Result.Item2, "Id", "DepartmentName");
+                    ViewBag.StatusId = new SelectList(statuses.Result.Item2, "Id", "Name");
+
                     return View(model);
                 }
             }
@@ -168,30 +181,86 @@ namespace WebMVC.Controllers
         }
 
         // GET: StudentsController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> EditAsync(int id)
         {
-            return View();
+            try
+            {
+                var result = await _studentsRepository.GetById(id);
+                if (result.Item1)
+                {
+                    var deps = _departamentsRepository.GetAll();
+                    var statuses = _statusRepository.GetAll();
+
+                    await Task.WhenAll(deps, statuses);
+                    ViewBag.DepartmentId = new SelectList(deps.Result.Item2, "Id", "DepartmentName", result.Item2.DepartmentId);
+                    ViewBag.StatusId = new SelectList(statuses.Result.Item2, "Id", "Name", result.Item2.StatusId);
+                    return View(result.Item2);
+                }
+                else
+                {
+                    TempData["SuccessResultF"] = result.Item1;
+                    TempData["SuccessResultM"] = "Student not found";
+
+                    return RedirectToAction("Index", "Students");
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         // POST: StudentsController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> EditAsync(ReadStudentDTO model)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                if (!ModelState.IsValid)
+                {
+                    ViewBag.Notification = new SuccessResult(false, "All fields are required!");
+                    return View(model);
+                }
+                var result = await _studentsRepository.Update(model.Id, model);
+                if (result.Item1)
+                {
+                    TempData["SuccessResultF"] = result.Item1;
+                    TempData["SuccessResultM"] = result.Item2;
+
+                    return RedirectToAction("Index", "Students");
+                }
+                else
+                {
+                    ViewBag.Notification = new SuccessResult((bool)result.Item1, (string)result.Item2);
+                    return View(model);
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+
+                throw ex;
             }
         }
 
         // GET: StudentsController/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> DeleteAsync(int id)
         {
-            return View();
+            try
+            {
+                var result = await _studentsRepository.Delete(id);
+                TempData["SuccessResultF"] = result.Item1;
+                TempData["SuccessResultM"] = result.Item2;
+
+                return RedirectToAction("Index", "Students");
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         // POST: StudentsController/Delete/5
@@ -201,7 +270,7 @@ namespace WebMVC.Controllers
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(IndexAsync));
             }
             catch
             {
